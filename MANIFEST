@@ -9,7 +9,6 @@ README.md
 t/00-load.t
 t/10-new.t
 t/boiler.t
-t/ca.t
 t/carp.t
 t/changes.t
 t/coverage.t
@@ -31,6 +30,5 @@ t/spelling.t
 t/strict.t
 t/uk.t
 t/unused.t
-t/us.t
 t/used.t
 t/vars.t
