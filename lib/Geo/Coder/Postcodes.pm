@@ -14,7 +14,6 @@ use URI;
 =head1 NAME
 
 Geo::Coder::Postcodes - Provides a geocoding functionality using https://postcodes.io.
-Note that this only works on towns and cities, it doesn't understand addresses or counties.
 
 =head1 VERSION
 
@@ -81,8 +80,17 @@ sub geocode {
 	my $location = $param{location}
 		or Carp::croak("Usage: geocode(location => \$location)");
 
+	my $county;
 	if($location =~ /,/) {
-		Carp::croak('Postcodes.io only supports towns, not full addresses');
+		if($location =~ /^(\w+)?,(.+),.+?$/) {
+			# Turn 'Ramsgate, Kent, UK' into 'Ramsgate'
+			$location = $1;
+			$county = $2;
+			$county =~ s/^\s//g;
+			$county =~ s/\s$//g;
+		} else {
+			Carp::croak('Postcodes.io only supports towns, not full addresses');
+		}
 	}
 
 	if (Encode::is_utf8($location)) {
@@ -106,6 +114,17 @@ sub geocode {
 	# TODO: wantarray
 	my $rc = $json->decode($res->content);
 	my @results = @{$rc->{result}};
+	if($county) {
+		# TODO: search through all results for the right one, e.g. Leeds in
+		#	Kent or in West Yorkshire?
+		my $result = $results[0];
+		if(defined($result->{'county_unitary'})) {
+			if($result->{'county_unitary'} ne $county) {
+				Carp::croak("county expected: $county, got " . $result->{'county_unitary'});
+			}
+		}
+		return $result;
+	}
 	return $results[0];
 }
 
@@ -155,6 +174,14 @@ sub reverse_geocode {
 
 	return $self->geocode(location => $latlng, reverse => 1);
 };
+
+=head1 BUGS
+
+Note that this most only works on towns and cities, some searches such as "Margate, Kent, UK"
+may work, but you're best to search only for "Margate".
+
+Looking for "Sheffield, South Yorkshire, UK" matches "Sheffield Green, East Sussex, UK", because
+it currently only uses the first result - it doesn't iterate through them all yet.
 
 =head1 AUTHOR
 

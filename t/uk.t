@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 6;
+use Test::Most tests => 8;
 
 BEGIN {
 	use_ok('Geo::Coder::Postcodes');
@@ -10,7 +10,7 @@ BEGIN {
 
 UK: {
 	SKIP: {
-		skip 'Test requires Internet access', 2 unless(-e 't/online.enabled');
+		skip 'Test requires Internet access', 4 unless(-e 't/online.enabled');
 
 		require Test::LWP::UserAgent;
 		Test::LWP::UserAgent->import();
@@ -26,7 +26,7 @@ UK: {
 
 		if($@) {
 			diag('Test::Number::Delta not installed - skipping tests');
-			skip 'Test::Number::Delta not installed', 2;
+			skip 'Test::Number::Delta not installed', 4;
 		}
 
 		my $geocoder = new_ok('Geo::Coder::Postcodes');
@@ -35,11 +35,9 @@ UK: {
 		delta_within($location->{latitude}, 51.33, 1e-2);
 		delta_within($location->{longitude}, 1.42, 1e-2);
 
-		eval {
-			does_carp_that_matches(sub { 
-				$location = $geocoder->geocode('Ramsgate, Kent, England');
-			}, qr/^postcodes.io only supports towns/);
-		};
+		$location = $geocoder->geocode('Ramsgate, Kent, England');
+		delta_within($location->{latitude}, 51.33, 1e-2);
+		delta_within($location->{longitude}, 1.42, 1e-2);
 
 		my $ua = new_ok('Test::LWP::UserAgent');
 		$ua->map_response('postcodes.io', new_ok('HTTP::Response' => [ '500' ]));
