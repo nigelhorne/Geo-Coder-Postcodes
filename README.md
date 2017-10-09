@@ -1,7 +1,6 @@
 # Geo::Coder::Postcodes
 
 Provides a geocoding functionality using https://postcodes.io.
-Note that this only works on towns and cities, it doesn't understand addresses or counties.
 
 # VERSION
 
@@ -53,6 +52,14 @@ You can also set your own User-Agent object:
     $location = $geocoder->reverse_geocode(latlng => '37.778907,-122.39732');
 
 Similar to geocode except it expects a latitude/longitude parameter.
+
+# BUGS
+
+Note that this most only works on towns and cities, some searches such as "Margate, Kent, UK"
+may work, but you're best to search only for "Margate".
+
+Looking for "Sheffield, South Yorkshire, UK" matches "Sheffield Green, East Sussex, UK", because
+it currently only uses the first result - it doesn't iterate through them all yet.
 
 # AUTHOR
 
