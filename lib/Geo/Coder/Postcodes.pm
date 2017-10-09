@@ -50,10 +50,10 @@ sub new {
 	my($class, %param) = @_;
 
 	my $ua = delete $param{ua} || LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
-	if(!defined($param{'host'})) {
-		$ua->ssl_opts(verify_hostname => 0);	# Yuck
-	}
-	my $host = delete $param{host} || 'postcodes.io';
+	# if(!defined($param{'host'})) {
+		# $ua->ssl_opts(verify_hostname => 0);	# Yuck
+	# }
+	my $host = delete $param{host} || 'api.postcodes.io';
 
 	return bless { ua => $ua, host => $host }, $class;
 }
@@ -172,7 +172,23 @@ sub reverse_geocode {
 	my $latlng = $param{latlng}
 		or Carp::croak("Usage: reverse_geocode(latlng => \$latlng)");
 
-	return $self->geocode(location => $latlng, reverse => 1);
+	my $uri = URI->new("https://$self->{host}/postcodes/");
+	my ($lat, $lon) = split(/,/, $param{latlng});
+	my %query_parameters = ('lat' => $lat, 'lon' => $lon, radius => '1000');
+	$uri->query_form(%query_parameters);
+	my $url = $uri->as_string;
+
+	my $res = $self->{ua}->get($url);
+
+	if ($res->is_error) {
+		Carp::croak("postcodes.io API returned error: on $url " . $res->status_line());
+	}
+
+	my $json = JSON->new->utf8;
+
+	my $rc = $json->decode($res->content);
+	my @results = @{$rc->{result}};
+	return $results[0];
 };
 
 =head1 BUGS
