@@ -22,7 +22,6 @@ t/manifest.t
 t/metrics.t
 t/namespaces.t
 t/noplan.t
-t/online.enabled
 t/pod-cm.t
 t/pod.t
 t/port.t
