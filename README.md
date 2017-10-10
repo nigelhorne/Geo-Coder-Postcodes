@@ -4,7 +4,7 @@ Provides a geocoding functionality using https://postcodes.io.
 
 # VERSION
 
-Version 0.01
+Version 0.02
 
 # SYNOPSIS
 
@@ -57,9 +57,6 @@ Similar to geocode except it expects a latitude/longitude parameter.
 
 Note that this most only works on towns and cities, some searches such as "Margate, Kent, UK"
 may work, but you're best to search only for "Margate".
-
-Looking for "Sheffield, South Yorkshire, UK" matches "Sheffield Green, East Sussex, UK", because
-it currently only uses the first result - it doesn't iterate through them all yet.
 
 # AUTHOR
 
