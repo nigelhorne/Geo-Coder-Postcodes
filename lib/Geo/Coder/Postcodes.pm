@@ -70,6 +70,9 @@ sub new {
 sub geocode {
 	my $self = shift;
 
+	scalar(@_) > 0 or
+		Carp::croak("Usage: geocode(location => \$location)");
+
 	my %param;
 	if (@_ % 2 == 0) {
 		%param = @_;
@@ -77,8 +80,11 @@ sub geocode {
 		$param{location} = shift;
 	}
 
-	my $location = $param{location}
-		or Carp::croak("Usage: geocode(location => \$location)");
+	my $location = $param{location};
+	unless(defined($location)) {
+		Carp::croak("Usage: geocode(location => \$location)");
+		return;
+	}
 
 	my $county;
 	if($location =~ /,/) {
@@ -105,8 +111,9 @@ sub geocode {
 
 	my $res = $self->{ua}->get($url);
 
-	if ($res->is_error) {
+	if($res->is_error) {
 		Carp::croak("postcodes.io API returned error: on $url " . $res->status_line());
+		return;
 	}
 
 	my $json = JSON->new->utf8;
@@ -163,6 +170,9 @@ Similar to geocode except it expects a latitude/longitude parameter.
 sub reverse_geocode {
 	my $self = shift;
 
+	scalar(@_) > 0 or
+		Carp::croak("Usage: reverse_geocode(latlng => \$latlng)");
+
 	my %param;
 	if (@_ % 2 == 0) {
 		%param = @_;
@@ -170,8 +180,11 @@ sub reverse_geocode {
 		$param{latlng} = shift;
 	}
 
-	my $latlng = $param{latlng}
-		or Carp::croak("Usage: reverse_geocode(latlng => \$latlng)");
+	my $latlng = $param{latlng};
+	unless(defined($latlng)) {
+		Carp::croak("Usage: reverse_geocode(latlng => \$latlng)");
+		return;
+	}
 
 	my $uri = URI->new("https://$self->{host}/postcodes/");
 	my ($lat, $lon) = split(/,/, $param{latlng});
@@ -183,6 +196,7 @@ sub reverse_geocode {
 
 	if ($res->is_error) {
 		Carp::croak("postcodes.io API returned error: on $url " . $res->status_line());
+		return;
 	}
 
 	my $json = JSON->new->utf8;

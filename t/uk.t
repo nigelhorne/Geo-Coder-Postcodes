@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 11;
+use Test::Most tests => 16;
 
 BEGIN {
 	use_ok('Geo::Coder::Postcodes');
@@ -10,7 +10,7 @@ BEGIN {
 
 UK: {
 	SKIP: {
-		skip 'Test requires Internet access', 10 unless(-e 't/online.enabled');
+		skip 'Test requires Internet access', 14 unless(-e 't/online.enabled');
 
 		require Test::LWP::UserAgent;
 		Test::LWP::UserAgent->import();
@@ -26,7 +26,7 @@ UK: {
 
 		if($@) {
 			diag('Test::Number::Delta not installed - skipping tests');
-			skip 'Test::Number::Delta not installed', 10;
+			skip 'Test::Number::Delta not installed', 14;
 		}
 
 		my $geocoder = new_ok('Geo::Coder::Postcodes');
@@ -34,41 +34,46 @@ UK: {
 		my $location = $geocoder->geocode('Ramsgate');
 		delta_within($location->{latitude}, 51.33, 1e-2);
 		delta_within($location->{longitude}, 1.42, 1e-2);
+		sleep(1);	# avoid being blacklisted
 
 		$location = $geocoder->geocode('Ramsgate, Kent, England');
 		delta_within($location->{latitude}, 51.33, 1e-2);
 		delta_within($location->{longitude}, 1.42, 1e-2);
+		sleep(1);	# avoid being blacklisted
 
 		# Check we don't get the one in Surrey
 		$location = $geocoder->geocode(location => 'Ashford, Kent, England');
 		delta_within($location->{latitude}, 51.15, 1e-2);
 		delta_within($location->{longitude}, 0.87, 1e-2);
+		sleep(1);	# avoid being blacklisted
 
-		eval {
-			does_carp_that_matches(sub { 
-				$location = $geocoder->geocode('Windsor Castle, Windsor, Berkshire, England');
-			}, qr/^Postcodes.io only supports towns/);
+		does_croak_that_matches(sub { 
+			$location = $geocoder->geocode('Windsor Castle, Windsor, Berkshire, England');
+		}, qr/^Postcodes.io only supports towns/);
+		sleep(1);	# avoid being blacklisted
 
-			does_carp_that_matches(sub { 
-				$location = $geocoder->geocode()
-			}, qr/^Usage: /);
+		does_croak_that_matches(sub { 
+			$location = $geocoder->geocode()
+		}, qr/^Usage: /);
+		sleep(1);	# avoid being blacklisted
 
-			does_carp_that_matches(sub { 
-				$location = $geocoder->reverse_geocode()
-			}, qr/^Usage: /);
-		};
+		does_croak_that_matches(sub { 
+			$location = $geocoder->reverse_geocode()
+		}, qr/^Usage: /);
+		sleep(1);	# avoid being blacklisted
 
 		my $address = $geocoder->reverse_geocode(latlng => '51.33,1.42');
 		like($address->{'parish'}, qr/Ramsgate/i, 'test reverse city');
+		sleep(1);	# avoid being blacklisted
 
 		my $ua = new_ok('Test::LWP::UserAgent');
-		$ua->map_response('postcodes.io', new_ok('HTTP::Response' => [ '500' ]));
+		$ua->map_response('api.postcodes.io', new_ok('HTTP::Response' => [ '500' ]));
 
 		$geocoder->ua($ua);
-		eval {
-			does_carp_that_matches(sub { 
-				$location = $geocoder->geocode('Sheffield');
-			}, qr/^postcodes.io API returned error: 500/);
-		};
+		does_croak_that_matches(sub { 
+			$location = $geocoder->geocode('Sheffield');
+		}, qr/^postcodes.io API returned error: /);
+
+		ok(ref($geocoder->ua) eq 'Test::LWP::UserAgent');
 	}
 }
