@@ -117,13 +117,14 @@ sub geocode {
 	if($county) {
 		# TODO: search through all results for the right one, e.g. Leeds in
 		#	Kent or in West Yorkshire?
-		my $result = $results[0];
-		if(defined($result->{'county_unitary'})) {
-			if($result->{'county_unitary'} ne $county) {
-				Carp::croak("county expected: $county, got " . $result->{'county_unitary'});
+		foreach my $result(@results) {
+			if(defined($result->{'county_unitary'})) {
+				if($result->{'county_unitary'} eq $county) {
+					return $result;
+				}
 			}
 		}
-		return $result;
+		return;
 	}
 	return $results[0];
 }
@@ -195,9 +196,6 @@ sub reverse_geocode {
 
 Note that this most only works on towns and cities, some searches such as "Margate, Kent, UK"
 may work, but you're best to search only for "Margate".
-
-Looking for "Sheffield, South Yorkshire, UK" matches "Sheffield Green, East Sussex, UK", because
-it currently only uses the first result - it doesn't iterate through them all yet.
 
 =head1 AUTHOR
 

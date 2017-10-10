@@ -1,4 +1,7 @@
 Revision history for Geo-Coder-Postcodes
 
+0.02
+	Look through all results for the correct county
+
 0.01	Mon Oct  9 12:27:05 EDT 2017
 	First Release
