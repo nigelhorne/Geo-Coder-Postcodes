@@ -126,7 +126,7 @@ sub geocode {
 		#	Kent or in West Yorkshire?
 		foreach my $result(@results) {
 			if(defined($result->{'county_unitary'})) {
-				if($result->{'county_unitary'} eq $county) {
+				if($result->{'county_unitary'} =~ /$county/) {
 					return $result;
 				}
 			}

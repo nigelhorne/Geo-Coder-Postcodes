@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 16;
+use Test::Most tests => 20;
 
 BEGIN {
 	use_ok('Geo::Coder::Postcodes');
@@ -10,7 +10,7 @@ BEGIN {
 
 UK: {
 	SKIP: {
-		skip 'Test requires Internet access', 14 unless(-e 't/online.enabled');
+		skip 'Test requires Internet access', 19 unless(-e 't/online.enabled');
 
 		require Test::LWP::UserAgent;
 		Test::LWP::UserAgent->import();
@@ -26,7 +26,7 @@ UK: {
 
 		if($@) {
 			diag('Test::Number::Delta not installed - skipping tests');
-			skip 'Test::Number::Delta not installed', 14;
+			skip 'Test::Number::Delta not installed', 19;
 		}
 
 		my $geocoder = new_ok('Geo::Coder::Postcodes');
@@ -45,6 +45,13 @@ UK: {
 		$location = $geocoder->geocode(location => 'Ashford, Kent, England');
 		delta_within($location->{latitude}, 51.15, 1e-2);
 		delta_within($location->{longitude}, 0.87, 1e-2);
+		sleep(1);	# avoid being blacklisted
+
+		$location = $geocoder->geocode('Plumstead, London, England');
+		ok(defined($location));
+		ok(ref($location) eq 'HASH');
+		delta_within($location->{latitude}, 51.48, 1e-2);
+		delta_within($location->{longitude}, 0.08, 1e-2);
 		sleep(1);	# avoid being blacklisted
 
 		does_croak_that_matches(sub { 

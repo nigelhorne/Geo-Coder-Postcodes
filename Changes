@@ -1,5 +1,8 @@
 Revision history for Geo-Coder-Postcodes
 
+0.03
+	Plumstead wasn't being found
+
 0.02	Tue Oct 10 10:54:02 EDT 2017
 	Look through all results for the correct county
 
