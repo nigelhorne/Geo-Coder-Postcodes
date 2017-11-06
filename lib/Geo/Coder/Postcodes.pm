@@ -206,7 +206,7 @@ sub reverse_geocode {
 	my $rc = $json->decode($res->content);
 	my @results = @{$rc->{result}};
 	return $results[0];
-};
+}
 
 =head1 BUGS
 
