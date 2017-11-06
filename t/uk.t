@@ -16,7 +16,7 @@ UK: {
 		Test::LWP::UserAgent->import();
 
 		require Test::Carp;
-		Test::Carp->import();;
+		Test::Carp->import();
 
 		eval {
 			require Test::Number::Delta;
@@ -71,12 +71,12 @@ UK: {
 		sleep(1);	# avoid being blacklisted
 
 		does_croak_that_matches(sub { 
-			$location = $geocoder->geocode()
+			$location = $geocoder->geocode();
 		}, qr/^Usage: /);
 		sleep(1);	# avoid being blacklisted
 
 		does_croak_that_matches(sub { 
-			$location = $geocoder->reverse_geocode()
+			$location = $geocoder->reverse_geocode();
 		}, qr/^Usage: /);
 		sleep(1);	# avoid being blacklisted
 
