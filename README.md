@@ -1,4 +1,6 @@
+[![Coverage Status](https://coveralls.io/repos/github/nigelhorne/Geo-Coder-Postcodes/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/Geo-Coder-Postcodes?branch=master)
 [![CPAN](https://img.shields.io/cpan/v/Geo-Coder-Postcodes.svg)](http://search.cpan.org/~nhorne/Geo-Coder-Postcodes/)
+[![Kritika Analysis Status](https://kritika.io/users/nigelhorne/repos/6314705722033970/heads/master/status.svg)](https://kritika.io/users/nigelhorne/repos/6314705722033970/heads/master/)
 
 # Geo::Coder::Postcodes
 
