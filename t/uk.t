@@ -65,17 +65,17 @@ UK: {
 		delta_within($location->{longitude}, -0.67, 1e-2);
 		sleep(1);	# avoid being blacklisted
 
-		does_croak_that_matches(sub { 
+		does_croak_that_matches(sub {
 			$location = $geocoder->geocode('Windsor Castle, Windsor, Berkshire, England');
 		}, qr/^Postcodes.io only supports towns/);
 		sleep(1);	# avoid being blacklisted
 
-		does_croak_that_matches(sub { 
+		does_croak_that_matches(sub {
 			$location = $geocoder->geocode();
 		}, qr/^Usage: /);
 		sleep(1);	# avoid being blacklisted
 
-		does_croak_that_matches(sub { 
+		does_croak_that_matches(sub {
 			$location = $geocoder->reverse_geocode();
 		}, qr/^Usage: /);
 		sleep(1);	# avoid being blacklisted
@@ -88,7 +88,7 @@ UK: {
 		$ua->map_response('api.postcodes.io', new_ok('HTTP::Response' => [ '500' ]));
 
 		$geocoder->ua($ua);
-		does_croak_that_matches(sub { 
+		does_croak_that_matches(sub {
 			$location = $geocoder->geocode('Sheffield');
 		}, qr/^postcodes.io API returned error: /);
 
