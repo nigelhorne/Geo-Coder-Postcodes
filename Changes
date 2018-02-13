@@ -1,5 +1,8 @@
 Revision history for Geo-Coder-Postcodes
 
+0.05
+	Find Bolton-upon-Dearne, which is not listed in a county
+
 0.04	Sat Oct 21 18:11:19 EDT 2017
 	Find places with spaces in them, such as South Bersted
 

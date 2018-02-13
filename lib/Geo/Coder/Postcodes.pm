@@ -88,7 +88,7 @@ sub geocode {
 
 	my $county;
 	if($location =~ /,/) {
-		if($location =~ /^([\w\s\-]+?),([\w\s]+?),[\w\s]+?$/) {
+		if($location =~ /^([\w\s\-]+?),([\w\s]+?),[\w\s]+?$/i) {
 			# Turn 'Ramsgate, Kent, UK' into 'Ramsgate'
 			$location = $1;
 			$county = $2;
@@ -126,11 +126,16 @@ sub geocode {
 	if($county) {
 		# TODO: search through all results for the right one, e.g. Leeds in
 		#	Kent or in West Yorkshire?
-		use Data::Dumper;
 		foreach my $result(@results) {
 			# if(defined($result->{'county_unitary'}) && ($result->{'county_unitary_type'} eq 'County')) {
-			if(defined($result->{'county_unitary'})) {
-				if($result->{'county_unitary'} =~ /$county/) {
+			if(my $unitary = $result->{'county_unitary'}) {
+				if($unitary =~ /$county/) {
+					return $result;
+				}
+			}
+			if((my $region = $result->{'region'}) && ($county =~ /\s+(\w+)$/)) {
+				if($region =~ /$1/) {
+					# e.g. looked for South Yorkshire, got Yorkshire and the Humber
 					return $result;
 				}
 			}
