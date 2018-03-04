@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 29;
+use Test::Most tests => 33;
 
 BEGIN {
 	use_ok('Geo::Coder::Postcodes');
@@ -10,7 +10,7 @@ BEGIN {
 
 UK: {
 	SKIP: {
-		skip 'Test requires Internet access', 28 unless(-e 't/online.enabled');
+		skip 'Test requires Internet access', 32 unless(-e 't/online.enabled');
 
 		require Test::LWP::UserAgent;
 		Test::LWP::UserAgent->import();
@@ -70,6 +70,12 @@ UK: {
 		ok(ref($location) eq 'HASH');
 		delta_within($location->{latitude}, 53.52, 1e-2);
 		delta_within($location->{longitude}, -1.31, 1e-2);
+
+		$location = $geocoder->geocode('Southend-on-Sea, Essex, England');
+		ok(defined($location));
+		ok(ref($location) eq 'HASH');
+		delta_within($location->{latitude}, 51.54, 1e-2);
+		delta_within($location->{longitude}, 0.71, 1e-2);
 
 		does_croak_that_matches(sub {
 			$location = $geocoder->geocode('Windsor Castle, Windsor, Berkshire, England');

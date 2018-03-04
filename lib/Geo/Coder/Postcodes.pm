@@ -129,7 +129,8 @@ sub geocode {
 		foreach my $result(@results) {
 			# if(defined($result->{'county_unitary'}) && ($result->{'county_unitary_type'} eq 'County')) {
 			if(my $unitary = $result->{'county_unitary'}) {
-				if($unitary =~ /$county/) {
+				# $location =~ s/+/ /g;
+				if(($unitary =~ /$county/i) || ($unitary =~ /$location/i)) {
 					return $result;
 				}
 			}
