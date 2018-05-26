@@ -17,11 +17,11 @@ Geo::Coder::Postcodes - Provides a geocoding functionality using https://postcod
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -71,7 +71,7 @@ sub geocode {
 	my $self = shift;
 
 	scalar(@_) > 0 or
-		Carp::croak("Usage: geocode(location => \$location)");
+		Carp::croak('Usage: geocode(location => $location)');
 
 	my %param;
 	if (@_ % 2 == 0) {
@@ -82,7 +82,7 @@ sub geocode {
 
 	my $location = $param{location};
 	unless(defined($location)) {
-		Carp::croak("Usage: geocode(location => \$location)");
+		Carp::croak('Usage: geocode(location => $location)');
 		return;
 	}
 
@@ -181,7 +181,7 @@ sub reverse_geocode {
 	my $self = shift;
 
 	scalar(@_) > 0 or
-		Carp::croak("Usage: reverse_geocode(latlng => \$latlng)");
+		Carp::croak('Usage: reverse_geocode(latlng => $latlng)');
 
 	my %param;
 	if (@_ % 2 == 0) {
@@ -192,7 +192,7 @@ sub reverse_geocode {
 
 	my $latlng = $param{latlng};
 	unless(defined($latlng)) {
-		Carp::croak("Usage: reverse_geocode(latlng => \$latlng)");
+		Carp::croak('Usage: reverse_geocode(latlng => $latlng)');
 		return;
 	}
 
@@ -238,7 +238,7 @@ L<Geo::Coder::GooglePlaces>, L<HTML::GoogleMaps::V3>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Nigel Horne.
+Copyright 2017-2018 Nigel Horne.
 
 This program is released under the following licence: GPL2
 
