@@ -27,22 +27,22 @@ our $VERSION = '0.05';
 
       use Geo::Coder::Postcodes;
 
-      my $geocoder = Geo::Coder::Postcodes->new();
-      my $location = $geocoder->geocode(location => 'Margate');
+      my $geo_coder = Geo::Coder::Postcodes->new();
+      my $location = $geo_coder->geocode(location => 'Margate');
 
 =head1 DESCRIPTION
 
 Geo::Coder::Postcodes provides an interface to postcodes.io,
-a free geocode database covering the towns in the UK.
+a free Geo-Coder database covering the towns in the UK.
 
 =head1 METHODS
 
 =head2 new
 
-    $geocoder = Geo::Coder::Postcodes->new();
+    $geo_coder = Geo::Coder::Postcodes->new();
     my $ua = LWP::UserAgent->new();
     $ua->env_proxy(1);
-    $geocoder = Geo::Coder::Postcodes->new(ua => $ua);
+    $geo_coder = Geo::Coder::Postcodes->new(ua => $ua);
 
 =cut
 
@@ -60,7 +60,7 @@ sub new {
 
 =head2 geocode
 
-    $location = $geocoder->geocode(location => $location);
+    $location = $geo_coder->geocode(location => $location);
 
     print 'Latitude: ', $location->{'latitude'}, "\n";
     print 'Longitude: ', $location->{'logitude'}, "\n";
@@ -152,12 +152,12 @@ Accessor method to get and set UserAgent object used internally. You
 can call I<env_proxy> for example, to get the proxy information from
 environment variables:
 
-    $geocoder->ua()->env_proxy(1);
+    $geo_coder->ua()->env_proxy(1);
 
 You can also set your own User-Agent object:
 
     use LWP::UserAgent::Throttled;
-    $geocoder->ua(LWP::UserAgent::Throttled->new());
+    $geo_coder->ua(LWP::UserAgent::Throttled->new());
 
 =cut
 
@@ -171,7 +171,7 @@ sub ua {
 
 =head2 reverse_geocode
 
-    $location = $geocoder->reverse_geocode(latlng => '37.778907,-122.39732');
+    $location = $geo_coder->reverse_geocode(latlng => '37.778907,-122.39732');
 
 Similar to geocode except it expects a latitude/longitude parameter.
 
