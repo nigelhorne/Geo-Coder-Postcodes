@@ -209,11 +209,14 @@ sub reverse_geocode {
 		return;
 	}
 
-	my $json = JSON->new->utf8;
+	my $json = JSON->new->utf8();
 
 	my $rc = $json->decode($res->content);
-	my @results = @{$rc->{result}};
-	return $results[0];
+	if($rc->{'result'}) {
+		my @results = @{$rc->{'result'}};
+		return $results[0];
+	}
+	return;
 }
 
 =head1 BUGS
@@ -238,7 +241,7 @@ L<Geo::Coder::GooglePlaces>, L<HTML::GoogleMaps::V3>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2018 Nigel Horne.
+Copyright 2017-2019 Nigel Horne.
 
 This program is released under the following licence: GPL2
 
