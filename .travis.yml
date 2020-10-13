@@ -4,6 +4,8 @@ os:
   # - osx
 
 perl:
+  - "5.30"
+  - "5.28"
   - "5.26"
   - "5.24"
   - "5.22"
@@ -11,13 +13,13 @@ perl:
   - "5.18"
   - "5.16"
   - "5.14"
-  - "5.12"
+  # - "5.12"
 
 before_install:
-  cpanm -n Devel::Cover::Report::Coveralls Test::Script Test::Pod::Spelling::CommonMistakes Test::Portability::Files Test::Taint Test::Carp LWP::Protocol::https JSON::XS Test::LWP::UserAgent
+  cpanm -qn Devel::Cover::Report::Coveralls Test::Script Test::Pod::Spelling::CommonMistakes Test::Portability::Files Test::Carp LWP::Protocol::https JSON::XS Test::LWP::UserAgent
 
 install:
-  - cpanm -v --installdeps --notest .
+  - cpanm -q --installdeps --notest .
 
 script:
   perl Makefile.PL && make && cover -test -report coveralls
