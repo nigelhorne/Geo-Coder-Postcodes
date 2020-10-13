@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 33;
+use Test::Most tests => 37;
 
 BEGIN {
 	use_ok('Geo::Coder::Postcodes');
@@ -12,17 +12,17 @@ UK: {
 	SKIP: {
 		if(!-e 't/online.enabled') {
 			diag('Online tests disabled');
-			skip('Online tests disabled', 32);
+			skip('Online tests disabled', 36);
 		}
 
-		require Test::LWP::UserAgent;
+		require_ok('Test::LWP::UserAgent');
 		Test::LWP::UserAgent->import();
 
-		require Test::Carp;
+		require_ok('Test::Carp');
 		Test::Carp->import();
 
 		eval {
-			require Test::Number::Delta;
+			require_ok('Test::Number::Delta');
 
 			Test::Number::Delta->import();
 		};
@@ -48,6 +48,7 @@ UK: {
 		$location = $geocoder->geocode(location => 'Ashford, Kent, England');
 		delta_within($location->{latitude}, 51.15, 1e-2);
 		delta_within($location->{longitude}, 0.87, 1e-2);
+		ok($location->{'county_unitary'} eq 'Kent');
 		sleep(1);	# avoid being blacklisted
 
 		# Check we don't get the one in Surrey

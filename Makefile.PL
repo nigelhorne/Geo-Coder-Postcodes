@@ -6,20 +6,10 @@ use IO::Socket::INET;
 
 my $online_tests;
 
-if($ENV{RELEASE_TESTING}) {
+if($ENV{AUTHOR_TESTING}) {
 	$online_tests = are_online();
-} elsif($ENV{AUTOMATED_TESTING} || $ENV{NO_NETWORK_TESTING} || (!-t STDIN)) {
-	$online_tests = 0;
 } else {
 	Getopt::Long::GetOptions('online-tests!' => \$online_tests);
-
-	if(!defined($online_tests)) {
-		if($ENV{RELEASE_TESTING}) {
-			$online_tests = are_online();
-		} else {
-			$online_tests = 0;
-		}
-	}
 }
 
 my $build_requires = {
@@ -77,11 +67,18 @@ WriteMakefile(
 
 sub are_online
 {
+	return 0 if($ENV{'AUTOMATED_TESTING'});
+	return 0 if($ENV{'NO_NETWORK_TESTING'});
+	return 0 if(!-t STDIN);
 	my $s = IO::Socket::INET->new(
 		PeerAddr => 'postcodes.io:443',
 		Timeout => 10
 	);
 	if($s) {
+		if($ENV{'PERL_MM_USE_DEFAULT'}) {
+			close($s);
+			return 1;
+		}
 		print <<EOF;
 
 You appear to be directly connected to the Internet.  I have some tests
