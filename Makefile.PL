@@ -10,6 +10,14 @@ if($ENV{AUTHOR_TESTING}) {
 	$online_tests = are_online();
 } else {
 	Getopt::Long::GetOptions('online-tests!' => \$online_tests);
+
+	if(!defined($online_tests)) {
+		$online_tests = are_online();
+	}
+	if(!$online_tests) {
+		print "On-line tests have been disabled\n";
+		$online_tests = 0;
+	}
 }
 
 my $build_requires = {
@@ -55,9 +63,11 @@ WriteMakefile(
 			type => 'git',
 			url => 'git://github.com/nigelhorne/Geo-Coder-Postcodes.git',
 			web => 'https://github.com/nigelhorne/Geo-Coder-Postcodes',
-		},
-		bugtracker => {
-			web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Postcodes',
+				repository => 'https://github.com/nigelhorne/Geo-Coder-Postcodes',
+		}, bugtracker => {
+			# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Postcodes',
+			web => 'https://github.com/nigelhorne/Geo-Coder-Postcodes/issues',
+			url => 'https://github.com/nigelhorne/Geo-Coder-Postcodes/issues',
 			mailto => 'bug-Geo-Coder-Postcodes@rt.cpan.org'
 		}
 	},
@@ -67,7 +77,7 @@ WriteMakefile(
 
 sub are_online
 {
-	return 0 if($ENV{'AUTOMATED_TESTING'});
+	# return 0 if($ENV{'AUTOMATED_TESTING'});
 	return 0 if($ENV{'NO_NETWORK_TESTING'});
 	return 0 if(!-t STDIN);
 	my $s = IO::Socket::INET->new(

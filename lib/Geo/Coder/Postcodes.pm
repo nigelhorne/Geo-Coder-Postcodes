@@ -226,9 +226,9 @@ may work, but you're best to search only for "Margate".
 
 =head1 AUTHOR
 
-Nigel Horne <njh@bandsman.co.uk>
+Nigel Horne C<< <njh@bandsman.co.uk> >>
 
-Based on L<Geo::Coder::Coder::Googleplaces>.
+Based on L<Geo::Coder::GooglePlaces>.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
