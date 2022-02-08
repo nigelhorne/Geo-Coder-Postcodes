@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 37;
+use Test::Most tests => 43;
 
 BEGIN {
 	use_ok('Geo::Coder::Postcodes');
@@ -12,7 +12,7 @@ UK: {
 	SKIP: {
 		if(!-e 't/online.enabled') {
 			diag('Online tests disabled');
-			skip('Online tests disabled', 36);
+			skip('Online tests disabled', 42);
 		}
 
 		require_ok('Test::LWP::UserAgent');
@@ -29,7 +29,7 @@ UK: {
 
 		if($@) {
 			diag('Test::Number::Delta not installed - skipping tests');
-			skip('Test::Number::Delta not installed', 28);
+			skip('Test::Number::Delta not installed', 34);
 		}
 
 		my $geocoder = new_ok('Geo::Coder::Postcodes');
@@ -81,6 +81,15 @@ UK: {
 		delta_within($location->{latitude}, 51.54, 1e-2);
 		delta_within($location->{longitude}, 0.71, 1e-2);
 
+		my $ua = new_ok('LWP::UserAgent');
+		$ua->default_header(accept_encoding => 'gzip,deflate');
+		my $geocoder2 = new_ok('Geo::Coder::Postcodes' => [ ua => $ua ]);
+		$location = $geocoder2->geocode('Brentford, London, England');
+		ok(defined($location));
+		ok(ref($location) eq 'HASH');
+		delta_within($location->{latitude}, 51.49, 1e-2);
+		delta_within($location->{longitude}, -0.31, 1e-2);
+
 		does_croak_that_matches(sub {
 			$location = $geocoder->geocode('Windsor Castle, Windsor, Berkshire, England');
 		}, qr/^Postcodes.io only supports towns/);
@@ -100,7 +109,7 @@ UK: {
 		like($address->{'parish'}, qr/Ramsgate/i, 'test reverse city');
 		sleep(1);	# avoid being blacklisted
 
-		my $ua = new_ok('Test::LWP::UserAgent');
+		$ua = new_ok('Test::LWP::UserAgent');
 		$ua->map_response('api.postcodes.io', new_ok('HTTP::Response' => [ '500' ]));
 
 		$geocoder->ua($ua);

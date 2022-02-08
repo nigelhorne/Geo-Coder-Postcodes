@@ -121,7 +121,7 @@ sub geocode {
 	my $json = JSON->new()->utf8();
 
 	# TODO: wantarray
-	my $rc = $json->decode($res->content);
+	my $rc = $json->decode($res->decoded_content());
 	my @results = @{$rc->{result}};
 	if($county) {
 		# TODO: search through all results for the right one, e.g. Leeds in
@@ -241,7 +241,7 @@ L<Geo::Coder::GooglePlaces>, L<HTML::GoogleMaps::V3>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2019 Nigel Horne.
+Copyright 2017-2022 Nigel Horne.
 
 This program is released under the following licence: GPL2
 
