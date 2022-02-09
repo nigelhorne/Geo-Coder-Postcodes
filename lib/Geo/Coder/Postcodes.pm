@@ -13,7 +13,7 @@ use URI;
 
 =head1 NAME
 
-Geo::Coder::Postcodes - Provides a geocoding functionality using https://postcodes.io.
+Geo::Coder::Postcodes - Provides a geocoding functionality using L<https://postcodes.io>.
 
 =head1 VERSION
 
