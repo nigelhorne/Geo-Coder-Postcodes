@@ -49,6 +49,11 @@ a free Geo-Coder database covering the towns in the UK.
 sub new {
 	my($class, %param) = @_;
 
+	if(!defined($class)) {
+		# Geo::Coder::Postcodes::new() used rather than Geo::Coder::Postcodes->new()
+		$class = __PACKAGE__;
+	}
+
 	my $ua = delete $param{ua} || LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
 	# if(!defined($param{'host'})) {
 		# $ua->ssl_opts(verify_hostname => 0);	# Yuck
