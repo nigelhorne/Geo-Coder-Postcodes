@@ -20,7 +20,8 @@ if($ENV{AUTHOR_TESTING}) {
 	}
 }
 
-my $build_requires = {
+my $test_requires = {
+	'Test::Compile' => 0,
 	'Test::Most' => 0,
 	'Test::NoWarnings' => 0,
 };
@@ -28,42 +29,41 @@ my $build_requires = {
 if($online_tests) {
 	open(my $enabled, '>', 't/online.enabled') || die "Can't touch t/online.enabled $!";
 	close($enabled) || die "Can't touch t/online.enabled $!";
-	$build_requires->{'Test::LWP::UserAgent'} = 0;
-	$build_requires->{'Test::Number::Delta'} = 0;
-	$build_requires->{'Test::Carp'} = 0;
+	$test_requires->{'Test::LWP::UserAgent'} = 0;
+	$test_requires->{'Test::Number::Delta'} = 0;
+	$test_requires->{'Test::Carp'} = 0;
 } else {
 	unlink('t/online.enabled');
 }
 
 WriteMakefile(
-    NAME		=> 'Geo::Coder::Postcodes',
-    AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
-    VERSION_FROM	=> 'lib/Geo/Coder/Postcodes.pm',
-    ABSTRACT_FROM       => 'lib/Geo/Coder/Postcodes.pm',
-    ((defined($ExtUtils::MakeMaker::VERSION) &&
-     ($ExtUtils::MakeMaker::VERSION >= 6.3002))
-      ? ('LICENSE'=> 'GPL')
-      : ()),
-    PL_FILES	=> {},
-    BUILD_REQUIRES => $build_requires,
-    PREREQ_PM => {
-	'Encode' => 0,
-	'JSON' => 0,
-	'HTTP::Request' => 0,
-	'LWP::UserAgent' => 0,
-	'LWP::Protocol::https' => 0,
-	'URI' => 0,
-    },
-    dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean		=> { FILES => 'Geo-Coder-Postcodes-*' },
-    META_MERGE		=> {
+	NAME		=> 'Geo::Coder::Postcodes',
+	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
+	VERSION_FROM	=> 'lib/Geo/Coder/Postcodes.pm',
+	ABSTRACT_FROM	=> 'lib/Geo/Coder/Postcodes.pm',
+	((defined($ExtUtils::MakeMaker::VERSION) &&
+	 ($ExtUtils::MakeMaker::VERSION >= 6.3002))
+	  ? ('LICENSE'=> 'GPL')
+	  : ()),
+	PL_FILES	=> {},
+	TEST_REQUIRES => $test_requires,
+	PREREQ_PM => {
+		'Encode' => 0,
+		'JSON' => 0,
+		'HTTP::Request' => 0,
+		'LWP::UserAgent' => 0,
+		'LWP::Protocol::https' => 0,
+		'URI' => 0,
+	}, dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+	clean		=> { FILES => 'Geo-Coder-Postcodes-*' },
+	META_MERGE		=> {
 	'meta-spec' => { version => 2 },
 	resources => {
 		repository => {
 			type => 'git',
 			url => 'git://github.com/nigelhorne/Geo-Coder-Postcodes.git',
 			web => 'https://github.com/nigelhorne/Geo-Coder-Postcodes',
-				repository => 'https://github.com/nigelhorne/Geo-Coder-Postcodes',
+			repository => 'https://github.com/nigelhorne/Geo-Coder-Postcodes',
 		}, bugtracker => {
 			# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Postcodes',
 			web => 'https://github.com/nigelhorne/Geo-Coder-Postcodes/issues',
@@ -71,8 +71,8 @@ WriteMakefile(
 			mailto => 'bug-Geo-Coder-Postcodes@rt.cpan.org'
 		}
 	},
-    },
-    MIN_PERL_VERSION	=> '5.6.2'	# Probably would work, but never tested on earlier versions than this
+	},
+	MIN_PERL_VERSION	=> '5.6.2'	# Probably would work, but never tested on earlier versions than this
 );
 
 sub are_online
