@@ -47,20 +47,25 @@ a free Geo-Coder database covering the towns in the UK.
 =cut
 
 sub new {
-	my($class, %param) = @_;
+	my $class = shift;
+	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	if(!defined($class)) {
 		# Geo::Coder::Postcodes::new() used rather than Geo::Coder::Postcodes->new()
+		# FIXME: this only works when no arguments are given
 		$class = __PACKAGE__;
+	} elsif(ref($class)) {
+		# clone the given object
+		return bless { %{$class}, %args }, ref($class);
 	}
 
-	my $ua = delete $param{ua} || LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
-	# if(!defined($param{'host'})) {
+	my $ua = delete $args{ua} || LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
+	# if(!defined($args{'host'})) {
 		# $ua->ssl_opts(verify_hostname => 0);	# Yuck
 	# }
-	my $host = delete $param{host} || 'api.postcodes.io';
+	my $host = delete $args{host} || 'api.postcodes.io';
 
-	return bless { ua => $ua, host => $host }, $class;
+	return bless { ua => $ua, host => $host, %args }, $class;
 }
 
 =head2 geocode
