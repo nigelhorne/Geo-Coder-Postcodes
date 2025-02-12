@@ -83,16 +83,22 @@ sub geocode {
 	scalar(@_) > 0 or
 		Carp::croak('Usage: geocode(location => $location)');
 
-	my %param;
+	my %params;
 	if (@_ % 2 == 0) {
-		%param = @_;
+		%params = @_;
 	} else {
-		$param{location} = shift;
+		$params{location} = shift;
 	}
 
-	my $location = $param{location};
+	my $location = $params{location};
 	unless(defined($location)) {
 		Carp::croak('Usage: geocode(location => $location)');
+		return;
+	}
+
+	# Fail when the input is just a set of numbers
+	if($params{'location'} !~ /\D/) {
+		Carp::croak('Usage: ', __PACKAGE__, ": invalid input to geocode(), $params{location}");
 		return;
 	}
 
@@ -251,7 +257,7 @@ L<Geo::Coder::GooglePlaces>, L<HTML::GoogleMaps::V3>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2024 Nigel Horne.
+Copyright 2017-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2
 
