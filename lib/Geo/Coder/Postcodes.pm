@@ -81,10 +81,8 @@ sub new {
 sub geocode {
 	my $self = shift;
 
-	scalar(@_) > 0 or
+	my $params = Params::Get::get_params('location', @_) ||
 		Carp::croak('Usage: geocode(location => $location)');
-
-	my $params = Params::Get::get_params('location', @_);
 
 	my $location = $params->{location};
 	unless(defined($location)) {
@@ -134,28 +132,30 @@ sub geocode {
 
 	# TODO: wantarray
 	my $rc = $json->decode($res->decoded_content());
-	my @results = @{$rc->{result}};
-	if($county) {
-		# TODO: search through all results for the right one, e.g. Leeds in
-		#	Kent or in West Yorkshire?
-		foreach my $result(@results) {
-			# if(defined($result->{'county_unitary'}) && ($result->{'county_unitary_type'} eq 'County')) {
-			if(my $unitary = $result->{'county_unitary'}) {
-				# $location =~ s/+/ /g;
-				if(($unitary =~ /$county/i) || ($unitary =~ /$location/i)) {
-					return $result;
+	if($rc->{'result'}) {
+		my @results = @{$rc->{result}};
+		if($county) {
+			# TODO: search through all results for the right one, e.g. Leeds in
+			#	Kent or in West Yorkshire?
+			foreach my $result(@results) {
+				# if(defined($result->{'county_unitary'}) && ($result->{'county_unitary_type'} eq 'County')) {
+				if(my $unitary = $result->{'county_unitary'}) {
+					# $location =~ s/+/ /g;
+					if(($unitary =~ /$county/i) || ($unitary =~ /$location/i)) {
+						return $result;
+					}
+				}
+				if((my $region = $result->{'region'}) && ($county =~ /\s+(\w+)$/)) {
+					if($region =~ /$1/) {
+						# e.g. looked for South Yorkshire, got Yorkshire and the Humber
+						return $result;
+					}
 				}
 			}
-			if((my $region = $result->{'region'}) && ($county =~ /\s+(\w+)$/)) {
-				if($region =~ /$1/) {
-					# e.g. looked for South Yorkshire, got Yorkshire and the Humber
-					return $result;
-				}
-			}
+			return;
 		}
-		return;
+		return $results[0];
 	}
-	return $results[0];
 }
 
 =head2 ua
@@ -176,7 +176,7 @@ You can also set your own User-Agent object:
 sub ua {
 	my $self = shift;
 	if (@_) {
-		$self->{ua} = shift;
+		$self->{ua} = $_[0];
 	}
 	$self->{ua};
 }

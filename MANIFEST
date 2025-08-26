@@ -35,6 +35,7 @@ t/port.t
 t/prereq.t
 t/snippets.t
 t/strict.t
+t/ua.t
 t/uk.t
 t/unused.t
 t/used.t
