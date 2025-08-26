@@ -5,6 +5,7 @@ use warnings;
 
 use Carp;
 use Encode;
+use Params::Get 0.13;
 use JSON::MaybeXS;
 use HTTP::Request;
 use LWP::UserAgent;
@@ -48,7 +49,7 @@ a free Geo-Coder database covering the towns in the UK.
 
 sub new {
 	my $class = shift;
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+	my $params = Params::Get::get_params(undef, @_) || {};
 
 	if(!defined($class)) {
 		# Geo::Coder::Postcodes::new() used rather than Geo::Coder::Postcodes->new()
@@ -56,16 +57,16 @@ sub new {
 		$class = __PACKAGE__;
 	} elsif(ref($class)) {
 		# clone the given object
-		return bless { %{$class}, %args }, ref($class);
+		return bless { %{$class}, %{$params} }, ref($class);
 	}
 
-	my $ua = delete $args{ua} || LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
+	my $ua = delete $params->{ua} || LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
 	# if(!defined($args{'host'})) {
 		# $ua->ssl_opts(verify_hostname => 0);	# Yuck
 	# }
-	my $host = delete $args{host} || 'api.postcodes.io';
+	my $host = delete $params->{host} || 'api.postcodes.io';
 
-	return bless { ua => $ua, host => $host, %args }, $class;
+	return bless { ua => $ua, host => $host, %{$params} }, $class;
 }
 
 =head2 geocode
@@ -83,22 +84,17 @@ sub geocode {
 	scalar(@_) > 0 or
 		Carp::croak('Usage: geocode(location => $location)');
 
-	my %params;
-	if (@_ % 2 == 0) {
-		%params = @_;
-	} else {
-		$params{location} = shift;
-	}
+	my $params = Params::Get::get_params('location', @_);
 
-	my $location = $params{location};
+	my $location = $params->{location};
 	unless(defined($location)) {
 		Carp::croak('Usage: geocode(location => $location)');
 		return;
 	}
 
 	# Fail when the input is just a set of numbers
-	if($params{'location'} !~ /\D/) {
-		Carp::croak('Usage: ', __PACKAGE__, ": invalid input to geocode(), $params{location}");
+	if($params->{'location'} !~ /\D/) {
+		Carp::croak('Usage: ', __PACKAGE__, ": invalid input to geocode(), $params->{location}");
 		return;
 	}
 
@@ -199,29 +195,24 @@ sub reverse_geocode {
 	scalar(@_) > 0 or
 		Carp::croak('Usage: reverse_geocode(latlng => $latlng)');
 
-	my %param;
-	if (@_ % 2 == 0) {
-		%param = @_;
-	} else {
-		$param{latlng} = shift;
-	}
+	my $params = Params::Get::get_params('latlng', @_) || {};
 
-	my $latlng = $param{latlng};
+	my $latlng = $params->{latlng};
 	unless(defined($latlng)) {
 		Carp::croak('Usage: reverse_geocode(latlng => $latlng)');
 		return;
 	}
 
 	my $uri = URI->new("https://$self->{host}/postcodes/");
-	my ($lat, $lon) = split(/,/, $param{latlng});
+	my ($lat, $lon) = split(/,/, $params->{latlng});
 	my %query_parameters = ('lat' => $lat, 'lon' => $lon, radius => '1000');
 	$uri->query_form(%query_parameters);
 	my $url = $uri->as_string;
 
 	my $res = $self->{ua}->get($url);
 
-	if ($res->is_error) {
-		Carp::croak("postcodes.io API returned error: on $url " . $res->status_line());
+	if($res->is_error()) {
+		Carp::croak("postcodes.io API returned error: on $url ", $res->status_line());
 		return;
 	}
 

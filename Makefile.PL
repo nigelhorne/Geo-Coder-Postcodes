@@ -38,6 +38,15 @@ if($online_tests) {
 	unlink('t/online.enabled');
 }
 
+my $dist = {
+	COMPRESS => 'gzip -9f',
+	SUFFIX => 'gz'
+};
+
+if($^O eq 'darwin') {
+	$dist->{'TAR'} = 'gtar';
+}
+
 WriteMakefile(
 	NAME		=> 'Geo::Coder::Postcodes',
 	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
@@ -55,8 +64,10 @@ WriteMakefile(
 		'HTTP::Request' => 0,
 		'LWP::UserAgent' => 0,
 		'LWP::Protocol::https' => 0,
+		'Params::Get' => 0.13,
 		'URI' => 0,
-	}, dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+	},
+	dist => $dist,
 	clean		=> { FILES => 'Geo-Coder-Postcodes-*' },
 	META_MERGE		=> {
 	'meta-spec' => { version => 2 },
