@@ -17,7 +17,7 @@ BEGIN {
 
 UA: {
 	SKIP: {
-		skip('Test requires Internet access', 8) unless(-e 't/online.enabled');
+		skip('Test requires Internet access', 4) unless(-e 't/online.enabled');
 
 		my $coder = new_ok('Geo::Coder::Postcodes');
 

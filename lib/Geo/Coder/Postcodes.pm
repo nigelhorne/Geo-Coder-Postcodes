@@ -123,7 +123,7 @@ sub geocode {
 
 	my $res = $self->{ua}->get($url);
 
-	if($res->is_error) {
+	if($res->is_error()) {
 		Carp::croak("postcodes.io API returned error: on $url " . $res->status_line());
 		return;
 	}
@@ -233,7 +233,7 @@ may work, but you're best to search only for "Margate".
 
 =head1 AUTHOR
 
-Nigel Horne C<< <njh@bandsman.co.uk> >>
+Nigel Horne C<< <njh@nigelhorne.com> >>
 
 Based on L<Geo::Coder::GooglePlaces>.
 

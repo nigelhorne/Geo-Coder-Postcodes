@@ -49,7 +49,7 @@ if($^O eq 'darwin') {
 
 WriteMakefile(
 	NAME		=> 'Geo::Coder::Postcodes',
-	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
+	AUTHOR		=> q{Nigel Horne <njh@nigelhorne.com>},
 	VERSION_FROM	=> 'lib/Geo/Coder/Postcodes.pm',
 	ABSTRACT_FROM	=> 'lib/Geo/Coder/Postcodes.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) &&
