@@ -10,6 +10,7 @@ use JSON::MaybeXS;
 use HTTP::Request;
 use LWP::UserAgent;
 use LWP::Protocol::https;
+use Object::Configure 0.14;
 use URI;
 
 =head1 NAME
@@ -60,13 +61,15 @@ sub new {
 		return bless { %{$class}, %{$params} }, ref($class);
 	}
 
-	my $ua = delete $params->{ua} || LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
+	$params = Object::Configure::configure($class, $params);
+
+	my $ua = $params->{ua} || LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
 	# if(!defined($args{'host'})) {
 		# $ua->ssl_opts(verify_hostname => 0);	# Yuck
 	# }
-	my $host = delete $params->{host} || 'api.postcodes.io';
+	my $host = $params->{host} || 'api.postcodes.io';
 
-	return bless { ua => $ua, host => $host, %{$params} }, $class;
+	return bless { %{$params}, ua => $ua, host => $host }, $class;
 }
 
 =head2 geocode

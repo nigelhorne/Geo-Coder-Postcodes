@@ -2,7 +2,7 @@ Revision history for Geo-Coder-Postcodes
 
 0.09
 	geocode(): croak when input is just a set of numbers
-	Use Params::Get
+	Use Params::Get and Object::Configure
 	Use gtar to create a distribution on Macs
 	Fix t/ua.t when not online
 

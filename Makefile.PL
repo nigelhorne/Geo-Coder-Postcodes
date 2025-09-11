@@ -65,27 +65,29 @@ WriteMakefile(
 		'LWP::UserAgent' => 0,
 		'LWP::Protocol::https' => 0,
 		'Params::Get' => 0.13,
+		'Object::Configure' => 0.14,
 		'URI' => 0,
 	},
 	dist => $dist,
 	clean		=> { FILES => 'Geo-Coder-Postcodes-*' },
 	META_MERGE		=> {
-	'meta-spec' => { version => 2 },
-	resources => {
-		repository => {
-			type => 'git',
-			url => 'git://github.com/nigelhorne/Geo-Coder-Postcodes.git',
-			web => 'https://github.com/nigelhorne/Geo-Coder-Postcodes',
-			repository => 'https://github.com/nigelhorne/Geo-Coder-Postcodes',
-		}, bugtracker => {
-			# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Postcodes',
-			web => 'https://github.com/nigelhorne/Geo-Coder-Postcodes/issues',
-			url => 'https://github.com/nigelhorne/Geo-Coder-Postcodes/issues',
-			mailto => 'bug-Geo-Coder-Postcodes@rt.cpan.org'
+		'meta-spec' => { version => 2 },
+		resources => {
+			repository => {
+				type => 'git',
+				url => 'git://github.com/nigelhorne/Geo-Coder-Postcodes.git',
+				web => 'https://github.com/nigelhorne/Geo-Coder-Postcodes',
+				repository => 'https://github.com/nigelhorne/Geo-Coder-Postcodes',
+			}, bugtracker => {
+				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Postcodes',
+				url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Postcodes',
+				# web => 'https://github.com/nigelhorne/Geo-Coder-Postcodes/issues',
+				# url => 'https://github.com/nigelhorne/Geo-Coder-Postcodes/issues',
+				mailto => 'bug-Geo-Coder-Postcodes@rt.cpan.org'
+			}
 		}
 	},
-	},
-	MIN_PERL_VERSION	=> '5.6.2'	# Probably would work, but never tested on earlier versions than this
+	MIN_PERL_VERSION => '5.6.2'	# Probably would work, but never tested on earlier versions than this
 );
 
 sub are_online
