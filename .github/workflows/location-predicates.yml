@@ -1,0 +1,165 @@
+---
+# The location rule, asked of this distribution on a schedule.
+#
+# Geo::Coder::Postcodes decides whether a value could be a location before it looks
+# it up, and since 0.10 that answer is
+# Geo::Location::Predicate::_valid_location() rather than a copy of the test
+# here.  The rule is a distribution of its own now, so a change to it, or a change
+# here that stops calling it, is drift that neither repository's ordinary test run
+# can see: this one's suite tests the checkout, and a checkout that has stopped
+# asking the rule would still answer itself and pass.
+#
+# So this job assembles the checkouts and runs Geo-Coder-Free's fuzz harness with
+# --sibling Geo-Coder-Postcodes: it drives this distribution's real geocode() with a user
+# agent that dies at the lookup, so nothing touches the network, and compares what
+# it answers with the rule's.  Only this distribution is graded - the other five
+# carry the same job for themselves, and a divergence in one of them must not turn
+# up red here - and the report says which were left out.
+#
+# The gate covers every value the rule decides on - digits, the empty string,
+# undef and references - so a sibling that accepts one the rule refuses fails
+# here as well.
+name: Location predicates
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+  schedule:
+    # Daily, staggered against the other five and against Geo-Coder-Free's run:
+    # the drift this looks for may arrive in a repository this one has not seen a
+    # push from, and six jobs failing in the same minute are harder to read than
+    # six spread out.
+    - cron: '43 5 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  fuzz:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    name: Geo::Coder::Postcodes against the rule, on Perl 5.40
+    steps:
+      - name: Check out this distribution at the commit under test
+        uses: actions/checkout@v7
+        with:
+          path: workspace/Geo-Coder-Postcodes
+
+      - name: Check out Geo-Coder-Free for the harness
+        uses: actions/checkout@v7
+        with:
+          repository: nigelhorne/Geo-Coder-Free
+          path: workspace/Geo-Coder-Free
+          token: ${{ secrets.WORKSPACE_TOKEN || github.token }}
+
+      # The rule is a distribution of its own, so the tree this distribution is
+      # graded against is this checkout: the harness puts the checkouts' lib/ ahead
+      # of any installed release and refuses to run if that is not the copy that
+      # answered.  The default token reads public repositories; set WORKSPACE_TOKEN
+      # only if one of these checkouts is private.
+      - name: Check out Geo-Location-Predicate, which holds the rule
+        uses: actions/checkout@v7
+        with:
+          repository: nigelhorne/Geo-Location-Predicate
+          path: workspace/Geo-Location-Predicate
+          token: ${{ secrets.WORKSPACE_TOKEN || github.token }}
+
+      - name: Check out Geo-Coder-CA
+        uses: actions/checkout@v7
+        with:
+          repository: nigelhorne/Geo-Coder-CA
+          path: workspace/Geo-Coder-CA
+          token: ${{ secrets.WORKSPACE_TOKEN || github.token }}
+
+      - name: Check out Geo-Coder-DataScienceToolkit
+        uses: actions/checkout@v7
+        with:
+          repository: nigelhorne/Geo-Coder-DataScienceToolkit
+          path: workspace/Geo-Coder-DataScienceToolkit
+          token: ${{ secrets.WORKSPACE_TOKEN || github.token }}
+
+      - name: Check out Geo-Coder-GeoApify
+        uses: actions/checkout@v7
+        with:
+          repository: nigelhorne/Geo-Coder-GeoApify
+          path: workspace/Geo-Coder-GeoApify
+          token: ${{ secrets.WORKSPACE_TOKEN || github.token }}
+
+      - name: Check out Geo-Coder-List
+        uses: actions/checkout@v7
+        with:
+          repository: nigelhorne/Geo-Coder-List
+          path: workspace/Geo-Coder-List
+          token: ${{ secrets.WORKSPACE_TOKEN || github.token }}
+
+      - name: Check out Geo-Coder-XYZ
+        uses: actions/checkout@v7
+        with:
+          repository: nigelhorne/Geo-Coder-XYZ
+          path: workspace/Geo-Coder-XYZ
+          token: ${{ secrets.WORKSPACE_TOKEN || github.token }}
+
+
+      # The harness says which checkout is missing, but only after the job has
+      # spent time on it; this says it first, and a checkout that silently failed
+      # would otherwise look like a fuzz that found nothing.
+      - name: Check that the workspace is there
+        shell: bash
+        run: |
+          set -eu
+          for dist in Geo-Coder-Free Geo-Location-Predicate Geo-Coder-CA \
+            Geo-Coder-DataScienceToolkit Geo-Coder-GeoApify Geo-Coder-List \
+            Geo-Coder-Postcodes Geo-Coder-XYZ; do
+            if [ ! -d "workspace/$dist/lib" ]; then
+              echo "::error::workspace/$dist was not checked out"
+              exit 1
+            fi
+          done
+          ls -1 workspace
+
+      - name: Setup Perl
+        uses: shogo82148/actions-setup-perl@v1.44.0
+        with:
+          perl-version: '5.40'
+
+      # What this distribution loads, listed by hand rather than taken from its
+      # metadata: its test requirement on Geo-Location-Predicate is the rule that
+      # is checked out above and may not be on CPAN yet, so an install that
+      # followed the metadata would fail here and look like a failure of the rule.
+      # Nothing is installed from Geo-Coder-Free: the harness puts the checkouts'
+      # lib/ on @INC itself, and only the graded sibling is loaded.
+      - name: Install what this distribution loads
+        shell: bash
+        run: |
+          set -eu
+          cpanm --notest --quiet Encode JSON::MaybeXS HTTP::Request LWP::UserAgent LWP::Protocol::https Params::Get Object::Configure URI
+
+      - name: Run the fuzz
+        working-directory: workspace/Geo-Coder-Free
+        shell: bash
+        run: |
+          set -u
+          status=0
+          # The report is Markdown, so it goes to the job summary as well: the
+          # class or the value this distribution stopped agreeing on is the whole
+          # finding, and it should not have to be read out of a log that has
+          # scrolled away.  The failures themselves go to stderr, which stays in
+          # the log.
+          perl scripts/location-predicate-fuzz.pl --iterations 20000 \
+            --sibling Geo-Coder-Postcodes --check \
+            > "$RUNNER_TEMP/location-predicates.md" \
+            2> "$RUNNER_TEMP/location-predicates.err" || status=$?
+          cat "$RUNNER_TEMP/location-predicates.md" >> "$GITHUB_STEP_SUMMARY"
+          cat "$RUNNER_TEMP/location-predicates.err" >&2
+          exit "$status"
