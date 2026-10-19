@@ -33,11 +33,11 @@ Geo::Coder::Postcodes - Provides a geocoding functionality using L<https://postc
 
 =head1 VERSION
 
-Version 0.10
+Version 0.09
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 
@@ -298,7 +298,7 @@ L<Geo::Coder::GooglePlaces>, L<HTML::GoogleMaps::V3>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2025 Nigel Horne.
+Copyright 2017-2026 Nigel Horne.
 
 This program is released under the following licence: GPL2
 
